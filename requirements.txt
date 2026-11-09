@@ -1,0 +1,9 @@
+python-dotenv
+psycopg[binary]
+google-api-python-client
+google-auth
+pymupdf
+google-genai
+streamlit
+pydantic
+llama-cloud

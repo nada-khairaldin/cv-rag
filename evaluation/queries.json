@@ -1,0 +1,8 @@
+﻿[
+  {
+    "id": "example_query_1",
+    "question": "What are the candidate's strongest skills?",
+    "expected_people": ["person_id_1"],
+    "notes": "Replace with the real evaluation set."
+  }
+]

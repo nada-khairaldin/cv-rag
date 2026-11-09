@@ -1,0 +1,6 @@
+.env
+.venv/
+data/
+secrets/
+__pycache__/
+scratch
