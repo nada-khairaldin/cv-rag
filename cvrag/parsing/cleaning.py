@@ -7,6 +7,8 @@ PAGE_BREAK and the separators are kept in the output. Standard library only.
 import re
 
 from . import PAGE_BREAK
+from .dates import is_date_line
+from .headings import looks_like_heading, match_heading
 
 # --- Step 1: characters -------------------------------------------------------
 
@@ -40,37 +42,8 @@ BULLET_MARKER = "- "
 
 # --- Step 5: wrapped lines ----------------------------------------------------
 
-KNOWN_HEADINGS = frozenset({
-    "PROFESSIONAL SUMMARY",
-    "SUMMARY",
-    "PROFILE",
-    "ABOUT ME",
-    "CORE SKILLS",
-    "SKILLS",
-    "TECHNICAL SKILLS",
-    "EXPERIENCE",
-    "WORK EXPERIENCE",
-    "PROFESSIONAL EXPERIENCE",
-    "WORK HISTORY",
-    "EDUCATION",
-    "PROJECTS",
-    "SELECTED PROJECTS",
-    "CERTIFICATIONS",
-    "CERTIFICATES",
-    "LANGUAGES",
-})
-MAX_HEADING_WORDS = 5
-MIN_HEADING_LETTERS = 3
-
-# Date lines such as "2024 - Present", "Jan 2021 - Mar 2023", "03/2021 - 05/2023".
-_MONTH = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\.?"
-_DATE_POINT = rf"(?:(?:0?[1-9]|1[0-2])/\d{{4}}|(?:{_MONTH}\s+)?\d{{4}})"
-_OPEN_END = r"(?:present|current|now|today|ongoing)"
-_RANGE_SEPARATOR = r"(?:\s*[-–—]\s*|\s+to\s+)"
-DATE_LINE_PATTERN = re.compile(
-    rf"^{_DATE_POINT}(?:{_RANGE_SEPARATOR}(?:{_DATE_POINT}|{_OPEN_END}))?$",
-    re.IGNORECASE,
-)
+# Headings come from headings.py and date lines from dates.py, so the same rules
+# serve section detection later on.
 
 # A line ending in one of these looks finished, so the next line is not a wrap.
 SENTENCE_END_CHARS = (".", "!", "?", ":")
@@ -236,7 +209,7 @@ def _should_join(line_a: str, line_b: str) -> bool:
         return False
     if second.startswith(BULLET_MARKER):
         return False
-    if _is_date_line(second):
+    if is_date_line(second):
         return False
     if first.endswith(SENTENCE_END_CHARS):
         return False
@@ -262,17 +235,9 @@ def _is_heading(line: str) -> bool:
     text = line.strip()
     if not text:
         return False
-    if text.upper() in KNOWN_HEADINGS or text.startswith("#"):
+    if match_heading(text) is not None or text.startswith("#"):
         return True
-    if text != text.upper():
-        return False
-    letters = sum(1 for char in text if char.isalpha())
-    return len(text.split()) <= MAX_HEADING_WORDS and letters >= MIN_HEADING_LETTERS
-
-
-def _is_date_line(line: str) -> bool:
-    """Tell whether a line holds only a date or a date range."""
-    return DATE_LINE_PATTERN.match(line.strip()) is not None
+    return looks_like_heading(text)
 
 
 def _last_word(line: str) -> str:
