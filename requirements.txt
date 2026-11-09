@@ -1,4 +1,4 @@
-python-dotenv
+﻿python-dotenv
 psycopg[binary]
 google-api-python-client
 google-auth
@@ -7,3 +7,4 @@ google-genai
 streamlit
 pydantic
 llama-cloud
+pytest

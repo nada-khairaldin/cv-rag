@@ -25,7 +25,7 @@ def list_files(folder_id: str = config.DRIVE_FOLDER_ID) -> list[dict]:
         response = service.files().list(
             q=f"'{folder_id}' in parents and trashed = false",
             fields=f"nextPageToken, files({FILE_FIELDS})",
-            orderBy="name", 
+            orderBy="name",
             pageSize=100,
             pageToken=page_token,
             supportsAllDrives=True,
